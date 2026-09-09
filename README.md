@@ -6,8 +6,6 @@ INSERT INTO <table_name_in_plural>
 (columns) VALUES
 (values);
 
-
-
 # Utility Commands
 \! cls
-mysqldump -u root -p --databases <database_name> > "G:\dev\IT30B\backups"
+mysqldump -u root -p --databases Library_db > "D:\IT30B\Backups"
