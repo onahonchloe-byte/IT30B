@@ -1,23 +1,23 @@
 <?php
 //Datatbase Connection
-$host =
-$db =
-$user =
-$pass =
-$charset ="utf"
+$host = 'localhost';
+$db = 'library_db';
+$user = 'root';
+$pass = '';
+$charset ="utf8mb4"
 
 $dsn = "mysql:host=$host; dbname=$db; charset=$charset";
 
 $options = [
-    PDO::ATTR_ERR => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     PDO:: ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO:: => PDO;
+    PDO:: ATTR_EMULATE_PREPARE => false,
 ];
 
 try{
     $pdo = new PDO($user,$pass, $options);
-    echo 'connection successful';
-}catch (PDOException $e){
+    
+}catch (PDOException $e) {
     die("Database connection failed".  $e->getMessage());
 }
 
@@ -25,19 +25,23 @@ try{
 session_start();
 
 //Determine current section
-$section =$_GET['section'] ??'student';
+$section =$_GET['section'] ?? 'student';
 
 //Determine CRUD Operation
-$action = $_GET['action'] ??'';
+$action = $_GET['action'] ?? '';
 
-    $stmt = $pdo->("
+// fetch students
+if($section=== 'student') {
+    $stmt = $pdo->query("
     SELECT *
     FROM students
     ORDER BY student_id DESC
     ");
 
-$students = $stmt->fetchAll();
+    $students = $stmt->fetchAll();
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,6 +100,8 @@ $students = $stmt->fetchAll();
 
     <?php if($section === 'books'):?>
         <h1>Books</h1>
+
+
     <?php if ($section === 'borrow'): ?>
         <h1>Borrow</h1>
     <?php endif;?>
