@@ -1,47 +1,54 @@
 <?php
-//Datatbase Connection
+
+//Database Connection
 $host = 'localhost';
-$db = 'library_db';
+$db = 'IT30B';
 $user = 'root';
 $pass = '';
-$charset ="utf8mb4"
+$charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host; dbname=$db; charset=$charset";
 
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO:: ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO:: ATTR_EMULATE_PREPARE => false,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES => false,
 ];
 
 try{
-    $pdo = new PDO($user,$pass, $options);
-    
-}catch (PDOException $e) {
-    die("Database connection failed".  $e->getMessage());
+    $pdo = new PDO($dsn,$user,$pass, $options);
+}catch(PDOException $e){
+    die("Database connection failed" . $e->getMessage());
 }
 
-//Session
+// Session
 session_start();
 
-//Determine current section
-$section =$_GET['section'] ?? 'student';
+// Determine current section
+$section = $_GET['section'] ??'students';
 
-//Determine CRUD Operation
+// Determine CRUD Operation
 $action = $_GET['action'] ?? '';
 
-// fetch students
-if($section=== 'student') {
+// Fetch Students
+if($section==='students'){
+    
     $stmt = $pdo->query("
-    SELECT *
-    FROM students
-    ORDER BY student_id DESC
+        SELECT *
+        FROM students
+        ORDER BY student_id DESC
     ");
 
     $students = $stmt->fetchAll();
 }
-?>
 
+
+
+
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,11 +61,80 @@ if($section=== 'student') {
     <nav>
         <a href="index.php?section=students">Students</a>
         <a href="index.php?section=books">Books</a>
-        <a href="index.php?section=borrow">borrow</a>
+        <a href="index.php?section=borrow">Borrow</a>
     </nav>
     <hr>
     <?php if($section === 'students'): ?>
         <h1>Students</h1>
+        <P> <a href ="create_student.php">Add New Student</a></P>
+            <?php if ($action==='created'): ?>
+            <h2>Create Student</h2>
+            
+            <form method="POST">
+                <p><label>First Name:</label>
+                <br>
+                <input type="text"
+                        name="student_first_name"
+                        required
+                    />
+                </p>
+
+                <p>
+                    <label>Last Name</label>
+                    <br>
+                    <input type="text"
+                        name="student_last_name"
+                        required
+                    />
+                </p>
+
+                <P>
+                    <label>Course</label>
+                    <br>
+                    <input type="text"
+                        name="student_course"
+                        required
+                    />
+                </P>
+
+                <button type="submit">
+                    Save
+                </button>
+
+                <a href="index.php?section=students">
+                    Cancel
+                </a>
+            </form>
+
+            if(SERVER["REQUEST_METHOD"]==='POST'){
+
+            $firstName = trim{$_POST['student_first_name'] ?? ''};
+            $lastName = trim{$_POST['student_last_name'] ?? ''};
+            $course = trim{$_POST['studnet_course'] ?? ''};
+
+            if($firstName ?== '' && $lastName !=='' && $course!=='')(
+                $sql = "
+                    INSERT INTO students(
+                        student_first_name,
+                        student_last_name,
+                        student_course
+                    )
+                    VALUE ?,?,?
+                    
+                ";
+
+                $stmt=$pdo->prepare($sql);
+
+                $stmt->execute(
+                    $firstname,
+                    $lastname,
+                    $course
+                )
+            )
+            }
+
+            header("LOcation: index.php?section=students");
+            <?php else : ?>
         <table>
             <thead>
                 <tr>
@@ -66,45 +142,52 @@ if($section=== 'student') {
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Course</th>
-                    <th>Create at</th>
+                    <th>Created at</th>
                     <th>Actions</th>
                 </tr>
             <thead>
-        <tbody>
-            <?php foreach($students as student): ?>
-                <tr>
-                    <td>
-                        <?=htmlspecialchars($student['student_id']) ?>
-                    </td>
-                    <td>
-                        <?=htmlspecialchars($student['student_first_name']) ?>
-                    </td>
-                    <td>
-                        <?=htmlspecialchars($student['student_last_name']) ?>
-                    </td>
-                    <td>
-                        <?=htmlspecialchars($student['student_course']) ?>
-                    </td>
-                    <td>
-                        <?=htmlspecialchars($student['student_course_at']) ?>
-                    </td>
-                    <td>
-                        <a>Edit</a>
-                        <a>Delete</a>
-                    </td>
-                </tr>
-            <?php endforeach?>
-        </tbody>
+            <tbody>
+                <?php foreach($students as $student): ?>
+                    <tr>
+                        <td>
+                            <?=htmlspecialchars($student['student_id']) ?>
+                        </td>
+                        <td>
+                            <?=htmlspecialchars($student['student_first_name']) ?>
+                        </td>
+                        <td>
+                            <?=htmlspecialchars($student['student_last_name']) ?>
+                        </td>
+                        <td>
+                            <?=htmlspecialchars($student['student_course']) ?>
+                        </td>
+                        <td>
+                            <?=htmlspecialchars($student['student_created_at']) ?>
+                        </td>
+                         <td>
+                            <a>Edit</a>|
+                            <a>Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach?>
+            </tbody>
+
+        </table>
+
+
+
+
 
     <?php endif;?>
 
-    <?php if($section === 'books'):?>
+    <?php if($section === 'books'): ?>
         <h1>Books</h1>
+    <?php endif;?>
 
-
-    <?php if ($section === 'borrow'): ?>
+    <?php if($section === 'borrow'): ?>
         <h1>Borrow</h1>
     <?php endif;?>
+
+    
 </body>
 </html>
-
