@@ -75,7 +75,42 @@ if($section=='students' && $action==='create'){
     }
 }
 
+//Update Student 
+if($section==='students' && $action==='update'){
 
+    $studentID = (int) ($_GET['id']) ?? 00;
+
+    if($_SERVER['REQUEST_METHOD'] ==='POST'){
+
+        $sql="
+            UPDATES STUDENTS
+            SET 
+                student_first_name = ?,
+                student_last_name = ?, 
+                student_course = ?           
+        ";
+    }
+
+        $stmt = $pdo->prepare($sql);
+
+        $stmt = execute([
+            $firstName,
+            $lastName,
+            $course,
+            $studentID
+        ]);
+
+        header("Location: index.php?section=students");
+        exit;
+    }
+
+    // Retrieve student info
+
+    $stmt = $pdo->prepare("
+    SELECT * 
+    FROM students
+    wHERE student_id = ?
+    ")
 
 
 
@@ -146,7 +181,10 @@ if($section=='students' && $action==='create'){
                 
             </form>
 
-        <?php else: ?>
+        <?php elseif($action==='update'): ?>
+            <h2>Update Student Info</h2>
+            <h2><?= htmlspecialchars($student['student_first_name']) ?></h2>
+            <?php else: ?>
 
             <table>
                 <thead>
