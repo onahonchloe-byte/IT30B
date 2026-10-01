@@ -104,6 +104,8 @@ if($section==='books' && $action==='update'){
         exit;
 
    } 
+    }
+
 
    // retrieve book info
    $stmt = $pdo->prepare("SELECT * FROM books WHERE book_id = ?");
@@ -114,7 +116,52 @@ if($section==='books' && $action==='update'){
    if(!$book){
         die("Book not found");
    }
-}
+   
+   // CREATE BOOK 
+    if [$section==='borrow' && $action==='create']{
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+        $student_Id = [int] ($_POST['student_id']  ?? 00);
+        $bookID = [int] ($_POST['book_id'] ?? 00);
+
+        if($studentID >0 && $bookId > 0) {
+
+            //Check if studwent has an unreturned 
+            $stmt = $pdo->prepare("
+            SELECT borrow_id
+            FROM borrow
+            WHERE student_id=?
+                AND borrow_return_date IS NULL
+                LIMIT 1
+                ");
+              
+            $stmt->execute([$student_Id]);  
+            
+            $studentBOrrow = $stmt0->fetch();
+
+            if($studentBOrrow){
+            $_SESSION('alert') = 'This book canoot be borrow because if has not been returned.';
+            }else{
+                $stmt = $pdo ->prepare("
+                SELECT borrow_id
+                FROM borrow
+                WHERE book_id = ?
+                AND boroaw_return_date IS NULL
+                LIMIT 1
+                ");
+
+                $stmt->execute([$borrowId]);
+
+                $bookborrow = $stmt->fetch();
+
+                if ($_SESSION('alert') = 'This book cannot be borrow because it has not been return. ');
+            } else {
+                $stmt = $pdo
+        }
+        }
+        }
+    }
+
 
 ?>
 <!DOCTYPE html>
@@ -313,9 +360,27 @@ if($section==='books' && $action==='update'){
 
         <h1>Borrow</h1>
 
-    <?php endif; ?>
+        <P> 
+            <a href="index.php?section=borrow&action=create">
+                Borrow a Book
+            </a>    
+        </P>
 
-    
+        <?php if [action== 'create']; ?>
+            <h2>Borrow a BOok</h2>
+
+            <form method="POST">            
+            </form>
+
+    <?php endif; ?> 
+
 </body>
-</html>
+<?php if(isset{$_SESSION['alert']}): ?>
+    <script>
+        alert( <?= json_encode($_SESSION['alert']) ?> );
+        </script>
 
+        <?php unset($_SESSION['alert']); ?>
+
+<?php endif; ?>
+</html>
